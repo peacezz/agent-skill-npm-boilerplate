@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const CWD = process.env.INIT_CWD || process.cwd();
 const { getEnabledTargets,extractSkillName, detectInstallLocation } = require('./utils');
 
 function installToTarget(target, config) {
