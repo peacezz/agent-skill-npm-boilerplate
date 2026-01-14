@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+const CWD = process.env.INIT_CWD || process.cwd();
+
 /**
  * Get enabled target configurations
  */
@@ -30,8 +32,8 @@ function getEnabledTargets(config) {
  * Extract skill name from package name (remove scope prefix)
  */
 function extractSkillName(packageName) {
-  return packageName.startsWith('@') ? 
-    packageName.split('/')[1] || packageName : 
+  return packageName.startsWith('@') ?
+    packageName.split('/')[1] || packageName :
     packageName;
 }
 
@@ -47,36 +49,35 @@ function detectInstallLocation(targetPaths, isGlobal) {
     };
   } else {
     // Project-level installation: find the actual project root directory
-    let currentDir = process.cwd();
-    let projectRoot = currentDir;
+    let projectRoot = CWD;
 
     // Search upward, skip node_modules directories, find the actual project root
     while (projectRoot !== path.dirname(projectRoot)) {
       // Check if this is a project root directory (contains package.json or .git)
       const hasPackageJson = fs.existsSync(path.join(projectRoot, 'package.json'));
       const hasGit = fs.existsSync(path.join(projectRoot, '.git'));
-      
+
       // Check if current directory is in node_modules
-      const isInNodeModules = projectRoot.includes('/node_modules/') || 
+      const isInNodeModules = projectRoot.includes('/node_modules/') ||
                              path.basename(projectRoot) === 'node_modules';
-      
+
       if ((hasPackageJson || hasGit) && !isInNodeModules) {
         // Found the actual project root directory
         break;
       }
-      
+
       // Continue searching upward
       projectRoot = path.dirname(projectRoot);
     }
-    
+
     // Verify the final path is reasonable
-    const finalIsInNodeModules = projectRoot.includes('/node_modules/') || 
+    const finalIsInNodeModules = projectRoot.includes('/node_modules/') ||
                                 path.basename(projectRoot) === 'node_modules';
-    
+
     if (finalIsInNodeModules) {
       // If suitable project root not found, use current working directory (with warning)
       console.warn('⚠ Warning: Could not find project root directory, using current directory');
-      projectRoot = process.cwd();
+      projectRoot = CWD;
     }
 
     return {

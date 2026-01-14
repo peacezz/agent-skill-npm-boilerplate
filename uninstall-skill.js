@@ -11,25 +11,25 @@ function uninstallFromTarget(target, config) {
 
   const isGlobal = process.env.npm_config_global === 'true';
   const location = detectInstallLocation(target.paths, isGlobal);
-  
+
   // Extract skill name from package name (remove scope prefix)
   const skillName = extractSkillName(config.name);
-  
+
   // Path format using skill name
   const skillNameTargetDir = path.join(location.base, skillName);
-  
+
   // Path format with full package name (including scope)
   const fullPackageNameTargetDir = path.join(location.base, config.name);
-  
+
   let removed = false;
-  
+
   // Check and remove path using skill name
   if (fs.existsSync(skillNameTargetDir)) {
     fs.rmSync(skillNameTargetDir, { recursive: true, force: true });
     console.log(`  ✓ Removed skill directory: ${skillName}`);
     removed = true;
   }
-  
+
   // Check and remove path with full package name (for compatibility)
   if (fs.existsSync(fullPackageNameTargetDir) && fullPackageNameTargetDir !== skillNameTargetDir) {
     fs.rmSync(fullPackageNameTargetDir, { recursive: true, force: true });
